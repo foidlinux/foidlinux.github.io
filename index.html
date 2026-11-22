@@ -1,140 +1,2078 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="noir">
 <head>
-<meta charset="UTF-8">
-<title>FOID Linux</title>
-<base target="_blank">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FOID Linux — Beautiful, unbloated &amp; from-scratch Linux</title>
+  <meta name="description" content="A tiny, source-first Linux distribution built completely from scratch. 100% static musl, runit PID 1, Limine bootloader, and zero systemd bloat. Glory to FOID.">
+  <meta name="keywords" content="FOID Linux, musl, runit, minimal linux, from scratch, limine bootloader, no systemd, source first, omarchy style">
+  
+  <meta property="og:title" content="FOID Linux — Beautiful, unbloated &amp; from-scratch Linux">
+  <meta property="og:description" content="A tiny, source-first Linux distribution built completely from scratch. 100% statically linked on musl, booted via Limine, runit init as PID 1, and zero systemd bloat.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://foidlinux.github.io">
+  <meta name="theme-color" content="#090a0f">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23090a0f'/%3E%3Cpath d='M8 7h16v3H11v6h11v3H11v7H8z' fill='%2300ff41'/%3E%3C/svg%3E">
+
+  <!-- Geist & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       Theme Variables (Omarchy-inspired Design Tokens)
+       ========================================================================== */
+    :root, [data-theme="noir"] {
+      --bg: #08090d;
+      --bg-deep: #040507;
+      --bg-surface: #0f1219;
+      --bg-surface-elevated: #161b26;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.18);
+      --brand: #00ff41;
+      --brand-glow: rgba(0, 255, 65, 0.22);
+      --brand-dim: rgba(0, 255, 65, 0.1);
+      --accent: #d4a017;
+      --accent-glow: rgba(212, 160, 23, 0.22);
+      --accent-dim: rgba(212, 160, 23, 0.1);
+      --text: #f0f3f6;
+      --text-secondary: #9aa2ac;
+      --text-muted: #5e6875;
+      --code-bg: #050609;
+      --danger: #ef4444;
+      --theme-name: "FOID Noir";
+    }
+
+    [data-theme="amber"] {
+      --bg: #0c0905;
+      --bg-deep: #060402;
+      --bg-surface: #17120a;
+      --bg-surface-elevated: #221a0e;
+      --border-subtle: rgba(245, 158, 11, 0.12);
+      --border-strong: rgba(245, 158, 11, 0.26);
+      --brand: #f59e0b;
+      --brand-glow: rgba(245, 158, 11, 0.25);
+      --brand-dim: rgba(245, 158, 11, 0.12);
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.22);
+      --accent-dim: rgba(16, 185, 129, 0.12);
+      --text: #fef3c7;
+      --text-secondary: #d6ba8d;
+      --text-muted: #7c6849;
+      --code-bg: #070503;
+      --danger: #f87171;
+      --theme-name: "Amber CRT";
+    }
+
+    [data-theme="solitude"] {
+      --bg: #11141f;
+      --bg-deep: #0b0d14;
+      --bg-surface: #181d2c;
+      --bg-surface-elevated: #22293d;
+      --border-subtle: rgba(112, 165, 253, 0.12);
+      --border-strong: rgba(112, 165, 253, 0.25);
+      --brand: #70a5fd;
+      --brand-glow: rgba(112, 165, 253, 0.25);
+      --brand-dim: rgba(112, 165, 253, 0.12);
+      --accent: #f43f5e;
+      --accent-glow: rgba(244, 63, 94, 0.22);
+      --accent-dim: rgba(244, 63, 94, 0.12);
+      --text: #edf2f7;
+      --text-secondary: #94a3b8;
+      --text-muted: #53637c;
+      --code-bg: #0c0e15;
+      --danger: #fb7185;
+      --theme-name: "Solitude Slate";
+    }
+
+    [data-theme="monolith"] {
+      --bg: #000000;
+      --bg-deep: #050505;
+      --bg-surface: #0e0e0e;
+      --bg-surface-elevated: #1a1a1a;
+      --border-subtle: rgba(255, 255, 255, 0.12);
+      --border-strong: rgba(255, 255, 255, 0.28);
+      --brand: #ffffff;
+      --brand-glow: rgba(255, 255, 255, 0.35);
+      --brand-dim: rgba(255, 255, 255, 0.12);
+      --accent: #a1a1aa;
+      --accent-glow: rgba(161, 161, 170, 0.25);
+      --accent-dim: rgba(161, 161, 170, 0.12);
+      --text: #ffffff;
+      --text-secondary: #a1a1aa;
+      --text-muted: #52525b;
+      --code-bg: #050505;
+      --danger: #ff5555;
+      --theme-name: "Onyx Monolith";
+    }
+
+    /* ==========================================================================
+       Global & Reset
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+      background-color: var(--bg);
+    }
+
+    /* Subtle background grid pattern like Omarchy */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 900px;
+      background-size: 32px 32px;
+      background-image: 
+        linear-gradient(to right, var(--border-subtle) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--border-subtle) 1px, transparent 1px);
+      mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    a {
+      color: var(--brand);
+      text-decoration: none;
+      transition: color 0.15s ease, opacity 0.15s ease;
+    }
+
+    a:hover {
+      text-decoration: underline;
+      opacity: 0.9;
+    }
+
+    code, pre {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ==========================================================================
+       Navigation (Omarchy floating glass bar)
+       ========================================================================== */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      text-decoration: none !important;
+    }
+
+    .brand-logo-badge {
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--brand-dim);
+      border: 1px solid var(--brand);
+      border-radius: 0;
+      color: var(--brand);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 0 12px var(--brand-glow);
+    }
+
+    .version-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--brand);
+      background: var(--brand-dim);
+      border: 1px solid var(--brand-glow);
+      padding: 0.15rem 0.5rem;
+      border-radius: 0;
+      letter-spacing: 0.04em;
+    }
+
+    nav.nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+    }
+
+    .nav-link {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none !important;
+      transition: color 0.15s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .btn-theme-picker {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0;
+      color: var(--text-secondary);
+      padding: 0.4rem 0.75rem;
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-theme-picker:hover {
+      color: var(--text);
+      background: var(--bg-surface-elevated);
+      border-color: var(--border-strong);
+    }
+
+    .btn-theme-picker kbd {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0;
+      padding: 0.1rem 0.3rem;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    .btn-nav-install {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--brand);
+      color: #000000;
+      padding: 0.4rem 0.9rem;
+      border-radius: 0;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none !important;
+      transition: all 0.15s ease;
+      box-shadow: 0 0 14px var(--brand-glow);
+    }
+
+    [data-theme="monolith"] .btn-nav-install {
+      color: #000000;
+    }
+
+    .btn-nav-install:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+
+    /* ==========================================================================
+       Top Announcement Ribbon
+       ========================================================================== */
+    .announcement-bar {
+      border-bottom: 1px solid var(--border-subtle);
+      background: color-mix(in srgb, var(--bg-deep) 60%, transparent);
+      padding: 0.55rem 0;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .announcement-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      text-decoration: none !important;
+      transition: color 0.15s ease;
+    }
+
+    .announcement-pill:hover {
+      color: var(--text);
+    }
+
+    .pill-badge {
+      background: var(--brand-dim);
+      border: 1px solid var(--brand-glow);
+      color: var(--brand);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.1rem 0.45rem;
+      border-radius: 0;
+    }
+
+    /* ==========================================================================
+       Hero Section (Omarchy Style Typography & Impact)
+       ========================================================================== */
+    .hero-section {
+      padding: 4.5rem 0 3.5rem;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+      font-weight: 600;
+    }
+
+    .hero-eyebrow span {
+      color: var(--brand);
+    }
+
+    .hero-heading {
+      font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      margin-bottom: 1.25rem;
+      max-width: 980px;
+    }
+
+    .hero-heading .brand-highlight {
+      color: var(--brand);
+      text-shadow: 0 0 30px var(--brand-glow);
+    }
+
+    .hero-lead {
+      font-size: 1.18rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 740px;
+      margin-bottom: 2rem;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .btn-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--brand);
+      color: #000000;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.75rem 1.6rem;
+      border-radius: 0;
+      text-decoration: none !important;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 24px var(--brand-glow);
+    }
+
+    .btn-main:hover {
+      filter: brightness(1.15);
+      transform: translateY(-2px);
+    }
+
+    .btn-subtle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-surface);
+      color: var(--text);
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.75rem 1.4rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 0;
+      text-decoration: none !important;
+      transition: all 0.2s ease;
+    }
+
+    .btn-subtle:hover {
+      background: var(--bg-surface-elevated);
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .quick-copy-cmd {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--code-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0;
+      padding: 0.75rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quick-copy-cmd:hover {
+      border-color: var(--brand);
+      color: var(--text);
+    }
+
+    .quick-copy-cmd .cmd-prefix {
+      color: var(--brand);
+      font-weight: bold;
+    }
+
+    /* ==========================================================================
+       Interactive Terminal (The Signature Hacker Element)
+       ========================================================================== */
+    .terminal-frame {
+      background: var(--code-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 35px var(--brand-dim);
+      overflow: hidden;
+      margin-bottom: 5rem;
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem;
+      background: color-mix(in srgb, var(--bg-surface) 60%, transparent);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .terminal-dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 0;
+    }
+    .td-red { background: #ff5f56; }
+    .td-yellow { background: #ffbd2e; }
+    .td-green { background: #27c93f; }
+
+    .terminal-tabs {
+      display: flex;
+      gap: 4px;
+    }
+
+    .term-tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 0;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .term-tab-btn:hover {
+      color: var(--text);
+      background: var(--bg-surface);
+    }
+
+    .term-tab-btn.active {
+      color: var(--brand);
+      background: var(--brand-dim);
+      border-color: var(--brand-glow);
+    }
+
+    .terminal-session-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .terminal-viewport {
+      padding: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: var(--text);
+      min-height: 340px;
+      overflow-x: auto;
+    }
+
+    .term-pane {
+      display: none;
+    }
+
+    .term-pane.active {
+      display: block;
+      animation: fadeIn 0.15s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .color-brand { color: var(--brand); }
+    .color-accent { color: var(--accent); }
+    .color-dim { color: var(--text-muted); }
+    .color-secondary { color: var(--text-secondary); }
+    .color-danger { color: var(--danger); }
+
+    .foidfetch-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .foidfetch-logo {
+      color: var(--brand);
+      font-weight: 700;
+      line-height: 1.25;
+      font-size: clamp(0.72rem, 1.4vw, 0.92rem);
+      user-select: none;
+      white-space: pre;
+      text-shadow: 0 0 12px var(--brand-glow);
+    }
+
+    .foidfetch-details {
+      flex: 1;
+      min-width: 280px;
+      line-height: 1.7;
+    }
+
+    .foidfetch-user {
+      color: var(--brand);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px dashed var(--border-subtle);
+      padding-bottom: 0.35rem;
+    }
+
+    .fetch-line {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .fetch-key {
+      width: 95px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .fetch-val {
+      color: var(--text);
+    }
+
+    .terminal-cli-dock {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      background: color-mix(in srgb, var(--bg-surface) 40%, transparent);
+      border-top: 1px solid var(--border-subtle);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+    }
+
+    .cli-prompt-label {
+      color: var(--brand);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .cli-input-field {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+    }
+
+    .cli-dock-hint {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .cli-output-log {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    /* ==========================================================================
+       Section Foundations (Clean Omarchy Layout)
+       ========================================================================== */
+    section {
+      padding: 5rem 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .section-head {
+      margin-bottom: 3rem;
+    }
+
+    .section-badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--brand);
+      margin-bottom: 0.6rem;
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 3.8vw, 2.75rem);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      color: var(--text);
+      line-height: 1.15;
+      margin-bottom: 0.85rem;
+    }
+
+    .section-desc {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      max-width: 680px;
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       Feature Cards Grid (Architecture & Inside)
+       ========================================================================== */
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0;
+      padding: 1.85rem;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .feature-card:hover {
+      background: var(--bg-surface-elevated);
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .feature-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .feature-num {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--brand-dim);
+      border: 1px solid var(--brand-glow);
+      border-radius: 0;
+      color: var(--brand);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .feature-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-glow);
+      padding: 0.15rem 0.5rem;
+      border-radius: 0;
+    }
+
+    .feature-card h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+    }
+
+    .feature-card p {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       Install & Quickstart (Omarchy Style Selector)
+       ========================================================================== */
+    .install-nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.75rem;
+    }
+
+    .install-tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      padding: 0.55rem 1.1rem;
+      border-radius: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.15s ease;
+    }
+
+    .install-tab-btn:hover {
+      color: var(--text);
+      background: var(--bg-surface);
+    }
+
+    .install-tab-btn.active {
+      color: var(--brand);
+      background: var(--brand-dim);
+      border-color: var(--brand-glow);
+    }
+
+    .install-panel {
+      display: none;
+    }
+
+    .install-panel.active {
+      display: block;
+      animation: fadeIn 0.15s ease;
+    }
+
+    .code-snippet-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0;
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+
+    .code-snippet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 1rem;
+      background: color-mix(in srgb, var(--bg-surface) 70%, transparent);
+      border-bottom: 1px solid var(--border-subtle);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .copy-snippet-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 0.25rem 0.65rem;
+      border-radius: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.15s ease;
+    }
+
+    .copy-snippet-btn:hover {
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+
+    .copy-snippet-btn.copied {
+      color: var(--brand);
+      border-color: var(--brand);
+    }
+
+    .code-snippet-body {
+      padding: 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: var(--text);
+      overflow-x: auto;
+    }
+
+    .guidance-box {
+      background: color-mix(in srgb, var(--accent-dim) 50%, var(--bg-surface));
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.25rem;
+      border-radius: 0;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .guidance-box strong {
+      color: var(--accent);
+    }
+
+    /* ==========================================================================
+       Themes Section (Signature Omarchy Feature!)
+       ========================================================================== */
+    .theme-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .theme-card-choice {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .theme-card-choice:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .theme-card-choice.active {
+      border-color: var(--brand);
+      box-shadow: 0 0 20px var(--brand-glow);
+    }
+
+    .theme-palette-swatch {
+      display: flex;
+      height: 38px;
+      border-radius: 0;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .swatch-slice {
+      flex: 1;
+    }
+
+    .theme-card-info h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+
+    .theme-card-info p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       Comparison Matrix (Minimalist & Crisp)
+       ========================================================================== */
+    .table-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0;
+      overflow-x: auto;
+    }
+
+    table.foid-matrix {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    table.foid-matrix th,
+    table.foid-matrix td {
+      padding: 1.05rem 1.35rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    table.foid-matrix th {
+      background: color-mix(in srgb, var(--bg-deep) 60%, transparent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    table.foid-matrix th.hero-column,
+    table.foid-matrix td.hero-column {
+      background: var(--brand-dim);
+      border-left: 1px solid var(--brand-glow);
+      border-right: 1px solid var(--brand-glow);
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    table.foid-matrix td {
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+    }
+
+    .matrix-pill {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 0;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .mp-brand {
+      background: var(--brand-dim);
+      color: var(--brand);
+      border: 1px solid var(--brand-glow);
+    }
+
+    .mp-danger {
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+
+    /* ==========================================================================
+       Roadmap (Next Horizons)
+       ========================================================================== */
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .roadmap-block {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0;
+      padding: 1.35rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .roadmap-icon-status {
+      margin-top: 2px;
+      color: var(--brand);
+    }
+
+    .roadmap-icon-status.pending {
+      color: var(--text-muted);
+    }
+
+    .roadmap-content h4 {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .roadmap-content p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* ==========================================================================
+       Doctrine & License Cards
+       ========================================================================== */
+    .doctrine-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .doctrine-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0;
+      padding: 1.6rem;
+    }
+
+    .doctrine-clause-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .doctrine-clause-title::before {
+      content: "§";
+      color: var(--brand);
+    }
+
+    .doctrine-clause-body {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       Footer (Omarchy Style Multi-Column)
+       ========================================================================== */
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 4rem 0 2.5rem;
+      background: var(--bg-deep);
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-brand-bio {
+      max-width: 380px;
+    }
+
+    .footer-brand-heading {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .footer-nav-groups {
+      display: flex;
+      gap: 3.5rem;
+    }
+
+    .footer-nav-col h5 {
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
+
+    .footer-nav-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .footer-nav-col a {
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      transition: color 0.15s ease;
+    }
+
+    .footer-nav-col a:hover {
+      color: var(--brand);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       Mobile Responsive Adjustments
+       ========================================================================== */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero-section { padding: 3rem 0 2rem; }
+      .hero-heading { font-size: 2.25rem; }
+      .foidfetch-layout { gap: 1rem; }
+      .foidfetch-logo { font-size: 0.72rem; }
+      .hero-cta-group { flex-direction: column; align-items: stretch; }
+      .hero-cta-group a, .hero-cta-group button { justify-content: center; }
+      .footer-nav-groups { flex-direction: column; gap: 2rem; }
+    }
+  </style>
 </head>
-<body bgcolor="#000000" text="#00ff00" link="#00ffff" vlink="#ff00ff">
+<body>
 
-<center>
+  <!-- Top Announcement Bar (like Omarchy) -->
+  <aside class="announcement-bar">
+    <div class="container">
+      <a href="https://github.com/foidlinux/foidlinux/releases" target="_blank" rel="noopener" class="announcement-pill">
+        <span class="pill-badge">v0.1-preview</span>
+        <span>FOID Linux live system is out — text-mode, hybrid Limine boot, and 100% static musl →</span>
+      </a>
+    </div>
+  </aside>
 
-<h1><font color="#ff0000" size="7">F</font><font color="#ffff00" size="7">O</font><font color="#00ff00" size="7">I</font><font color="#00ffff" size="7">D</font> <font color="#ff00ff" size="7">LINUX</font></h1>
+  <!-- Sticky Navbar -->
+  <header>
+    <div class="container nav-inner">
+      <a href="#" class="brand-wrap">
+        <span class="brand-logo-badge">F</span>
+        <span>FOID LINUX</span>
+        <span class="version-tag">0.1</span>
+      </a>
 
-<p><font color="#aaaaaa" size="2">Freedom &middot; Open &middot; Independent &middot; Distributed</font></p>
+      <nav class="nav-links">
+        <a href="#about" class="nav-link">About</a>
+        <a href="#components" class="nav-link">Architecture</a>
+        <a href="#install" class="nav-link">Install &amp; Try</a>
+        <a href="#themes" class="nav-link">Themes</a>
+        <a href="#matrix" class="nav-link">Comparison</a>
+        <a href="#roadmap" class="nav-link">Roadmap</a>
+        <a href="#doctrine" class="nav-link">Doctrine</a>
+      </nav>
 
-<marquee behavior="scroll" direction="left" scrollamount="8">
-<font color="#ffff00">★ NO SYSTEMD ★ NO BLOAT ★ MUSL LIBC ★ RUNIT ★ SWAY ★ ROLLING RELEASE ★ SOURCE FIRST ★</font>
-</marquee>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn-theme-picker" title="Press T to cycle theme">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <span id="theme-label-nav">Theme</span>
+          <kbd>T</kbd>
+        </button>
+        <a href="#install" class="btn-nav-install">
+          <span>Get FOID</span>
+        </a>
+      </div>
+    </div>
+  </header>
 
-<br><br>
+  <!-- Hero Section -->
+  <main class="container">
+    <div class="hero-section">
+      <div class="hero-eyebrow">
+        <span>★</span> Freedom · Open · Independent · Distributed <span>★</span>
+      </div>
+      <h1 class="hero-heading">
+        FOID Linux: <br>
+        <span class="brand-highlight">Radically minimal, source-first Linux.</span>
+      </h1>
+      <p class="hero-lead">
+        The uncompromising OS built from scratch for the anti-bloat era. 
+        No Debian, Arch, or Alpine underneath. 100% statically linked on musl libc, 
+        booted via Limine, runit init as PID 1, and zero systemd. Glory to FOID.
+      </p>
 
-<table border="1" cellpadding="10" cellspacing="0" width="80%" bgcolor="#111111">
-<tr>
-<td align="center" colspan="2">
-<font color="#ffffff" size="5"><b>WHAT IS FOID LINUX</b></font>
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-<font color="#00ff00">
-FOID Linux is a minimal, source-first distribution for developers who value control over convenience.
-<br><br>
-We believe an operating system should be understandable from top to bottom. No hidden services, no opaque configuration, no vendor lock-in.
-<br><br>
-<font color="#ffff00">★ Base size: only ??? ★</font>
-</font>
-</td>
-<td width="50%" valign="top">
-<font color="#00ffff">
-<b>System:</b><br>
-&middot; libc: musl<br>
-&middot; init: runit<br>
-&middot; WM: sway (Wayland)<br>
-&middot; release: rolling<br>
-<br>
-<b>Philosophy:</b><br>
-&middot; Freedom<br>
-&middot; Open<br>
-&middot; Independent<br>
-&middot; Distributed
-</font>
-</td>
-</tr>
-</table>
+      <div class="hero-cta-group">
+        <a href="#install" class="btn-main">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Try 0.1-preview</span>
+        </a>
+        <a href="https://github.com/foidlinux/foidlinux" target="_blank" rel="noopener" class="btn-subtle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+          <span>View Source on GitHub</span>
+        </a>
+        <div class="quick-copy-cmd" id="hero-quick-copy" data-copy="qemu-system-x86_64 -m 2G -enable-kvm -cdrom foid-linux.iso" title="Click to copy QEMU test command">
+          <span class="cmd-prefix">$</span>
+          <span>qemu-system-x86_64 -m 2G ...</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        </div>
+      </div>
+    </div>
 
-<br>
+    <!-- Interactive Terminal Frame (foidfetch + logs) -->
+    <div class="terminal-frame">
+      <div class="terminal-bar">
+        <div class="terminal-dots">
+          <span class="terminal-dot td-red"></span>
+          <span class="terminal-dot td-yellow"></span>
+          <span class="terminal-dot td-green"></span>
+        </div>
+        <div class="terminal-tabs">
+          <button class="term-tab-btn active" data-tab="foidfetch">foidfetch</button>
+          <button class="term-tab-btn" data-tab="bootlog">boot.log</button>
+          <button class="term-tab-btn" data-tab="help">foid-help</button>
+          <button class="term-tab-btn" data-tab="doctrine">foid-license</button>
+        </div>
+        <div class="terminal-session-title">root@foid:~#</div>
+      </div>
 
-<table border="1" cellpadding="8" cellspacing="0" width="80%" bgcolor="#111111">
-<tr bgcolor="#333333">
-<td><font color="#ffffff"><b>Property</b></font></td>
-<td><font color="#ffffff"><b>FOID</b></font></td>
-<td><font color="#ffffff"><b>Void</b></font></td>
-<td><font color="#ffffff"><b>Alpine</b></font></td>
-<td><font color="#ffffff"><b>Arch</b></font></td>
-</tr>
-<tr>
-<td><font color="#aaaaaa">libc</font></td>
-<td><font color="#00ff00">musl</font></td>
-<td><font color="#aaaaaa">musl/glibc</font></td>
-<td><font color="#00ff00">musl</font></td>
-<td><font color="#ff0000">glibc</font></td>
-</tr>
-<tr>
-<td><font color="#aaaaaa">init</font></td>
-<td><font color="#00ff00">runit</font></td>
-<td><font color="#00ff00">runit</font></td>
-<td><font color="#aaaaaa">openrc</font></td>
-<td><font color="#ff0000">systemd</font></td>
-</tr>
-<tr>
-<td><font color="#aaaaaa">WM default</font></td>
-<td><font color="#00ff00">sway</font></td>
-<td><font color="#aaaaaa">-</font></td>
-<td><font color="#aaaaaa">-</font></td>
-<td><font color="#aaaaaa">-</font></td>
-</tr>
-<tr>
-<td><font color="#aaaaaa">base size</font></td>
-<td><font color="#00ff00">???</font></td>
-<td><font color="#aaaaaa">~400 MB</font></td>
-<td><font color="#aaaaaa">~130 MB</font></td>
-<td><font color="#ff0000">~800 MB</font></td>
-</tr>
-</table>
+      <div class="terminal-viewport" id="term-viewport">
+        <!-- Tab: foidfetch -->
+        <div class="term-pane active" id="pane-foidfetch">
+          <div class="foidfetch-layout">
+            <pre class="foidfetch-logo">
+       ##
+        ###
+         #####
+           #####
+             #####
+               #####
+                 #####
+                   ####
+                     ###
+                  ########
+          ##################
+         #####################
+         ###         #########
+                 #######
+            ######
+         ####</pre>
+            <div class="foidfetch-details">
+              <div class="foidfetch-user">root@foid</div>
+              <div class="fetch-line"><span class="fetch-key">os</span><span class="fetch-val">FOID Linux 0.1-preview</span></div>
+              <div class="fetch-line"><span class="fetch-key">kernel</span><span class="fetch-val">6.18-foid (monolithic LTS)</span></div>
+              <div class="fetch-line"><span class="fetch-key">init</span><span class="fetch-val">runit (foidinit PID 1)</span></div>
+              <div class="fetch-line"><span class="fetch-key">uptime</span><span class="fetch-val">42 min</span></div>
+              <div class="fetch-line"><span class="fetch-key">procs</span><span class="fetch-val">18 (static userspace)</span></div>
+              <div class="fetch-line"><span class="fetch-key">memory</span><span class="fetch-val">28 / 2048 MiB</span></div>
+              <div class="fetch-line"><span class="fetch-key">shell</span><span class="fetch-val">sh (static BusyBox ash)</span></div>
+              <div class="fetch-line"><span class="fetch-key">network</span><span class="fetch-val">eth0: 192.168.1.137/24 (udhcpc)</span></div>
+              <div class="fetch-line"><span class="fetch-key">libc</span><span class="fetch-val color-brand">musl (the only correct one)</span></div>
+              <div class="fetch-line"><span class="fetch-key">manual</span><span class="fetch-val color-accent">RTFM (there is none)</span></div>
+              <div class="fetch-line" style="margin-top: 0.5rem;">
+                <span class="fetch-key">FOID level</span>
+                <span class="fetch-val"><strong class="color-brand">39</strong> — <span class="color-accent">Foid Initiate</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-<br>
+        <!-- Tab: boot.log -->
+        <div class="term-pane" id="pane-bootlog">
+          <pre style="line-height: 1.6;">
+<span class="color-dim">[    0.000000]</span> Linux version 6.18-foid (musl-cross-make x86_64)
+<span class="color-dim">[    0.045210]</span> Limine 8.x: Handed over execution in hybrid BIOS/UEFI mode
+<span class="color-dim">[    0.112450]</span> initramfs: mounting proc, sysfs, devtmpfs...
+<span class="color-brand">[ GLORY ]</span> <span style="font-weight: 600;">foidinit stage 1: glory to FOID Linux! mounting the world</span>
+<span class="color-accent">[  INFO ]</span> Finding media with /foid/rootfs.squashfs...
+<span class="color-brand">[   OK  ]</span> Mounted squashfs (xz compressed, 1M block)
+<span class="color-brand">[   OK  ]</span> Constructed overlayfs (squashfs + tmpfs in RAM)
+<span class="color-dim">[    0.891200]</span> switch_root /mnt/newroot /sbin/runit-init
+<span class="color-brand">[ GLORY ]</span> <span style="font-weight: 600;">foidinit stage 2: services march under the banner of FOID</span>
+<span class="color-brand">[   OK  ]</span> runsvdir started on /etc/service
+<span class="color-brand">[   OK  ]</span> udhcpc: lease acquired on eth0 (192.168.1.137)
+<span class="color-brand">[ GLORY ]</span> <span style="font-weight: 600;">tty1 reports for duty, glory to FOID</span>
+<span class="color-dim">------------------------------------------------------------------------</span>
+FOID Linux 0.1-preview (\l)
+Welcome to FOID Linux. Freedom. Open. Independent. Distributed.
+Glory to FOID. There is no manual. Type `foidfetch` to measure your foid.</pre>
+        </div>
 
-<table border="1" cellpadding="10" cellspacing="0" width="80%" bgcolor="#111111">
-<tr>
-<td align="center">
-<font color="#ffffff" size="4"><b>DOWNLOAD</b></font>
-</td>
-</tr>
-<tr>
-<td align="center">
-<br>
-<font color="#ff0000" size="6"><b>NOT READY YET</b></font>
-<br><br>
-<font color="#aaaaaa">
-We are still compiling the kernel.<br>
-Please check back later or subscribe to our subreddit for updates.
-</font>
-<br><br>
-<font color="#ffff00">★ Estimated release: when its done ★</font>
-<br><br>
-</td>
-</tr>
-</table>
+        <!-- Tab: help -->
+        <div class="term-pane" id="pane-help">
+          <pre style="line-height: 1.6;">
+<span class="color-brand">FOID Linux help</span>
+There is no manual. RTFM. (You are the manual.) But since you asked nicely:
 
-<br>
+  <span class="color-accent">foidfetch</span>          measure your foid level and view system specs
+  <span class="color-accent">ip addr</span>            show network status (DHCP starts automatically)
+  <span class="color-accent">nano, vi</span>           edit files in text console
+  <span class="color-accent">htop</span>               watch processes (idle footprint &lt; 30MB)
+  <span class="color-accent">curl, git</span>          download archives, clone repos (HTTPS via OpenSSL)
+  <span class="color-accent">ssh, scp</span>           dropbear SSH client
+  <span class="color-accent">dropbear</span>           SSH server (off by default):
+                     <span class="color-dim">ln -s /etc/sv/dropbear /etc/service/</span>
+  <span class="color-accent">poweroff, reboot</span>   do exactly what they say
+  <span class="color-accent">rtfm</span>               read the manual (see above)</pre>
+        </div>
 
-<p>
-<a href="https://github.com/foidlinux/foidlinux"><font size="5"><b>[ SOURCE CODE ]</b></font></a>
-&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://reddit.com/r/foidlinux"><font size="5"><b>[ REDDIT ]</b></font></a>
-</p>
+        <!-- Tab: doctrine -->
+        <div class="term-pane" id="pane-doctrine">
+          <pre style="line-height: 1.6;">
+<span class="color-accent">FOID LICENSE — Version 1.0, August 2026</span>
+<span class="color-dim">Copyright (c) 2026 FOID Linux Contributors</span>
 
-<br>
+<span class="color-brand">1. THE FOID CLAUSE</span>
+   If you fork this project, do not call it "FOID" or use the FOID logo/name.
+   Make your own name. Be independent.
 
-<hr width="80%">
+<span class="color-danger">2. THE NO-BLOAT CLAUSE</span>
+   This Software may not be used in any project that depends on systemd as its
+   init system. If your init is a symlink to systemd, you are in violation.
+   RAM-incompatible software includes: GNOME (&gt;2.x), Electron (Discord, Slack,
+   VS Code), Snap, and processes whose RSS exceeds 512MB idle.
 
-<p><font color="#555555" size="2">
-&copy; 2026 FOID Linux contributors<br>
-Best viewed in Netscape Navigator 1.0
-</font></p>
+<span class="color-accent">3. THE FEDORA CLAUSE</span>
+   Do not mention "Fedora" in connection with this Software. We do not talk
+   about Fedora. We do not think about Fedora.
 
-</center>
+<span class="color-brand">4. THE RTFM CLAUSE</span>
+   The answer is in the manual. It is always in the manual. If you refuse to
+   read the manual, your suffering is self-inflicted and no one feels sorry for you.</pre>
+        </div>
 
+        <div class="cli-output-log" id="cli-output-log" style="display: none;"></div>
+      </div>
+
+      <!-- Live Terminal Input Dock -->
+      <div class="terminal-cli-dock">
+        <span class="cli-prompt-label">root@foid</span>:<span class="color-accent">~</span># 
+        <input type="text" id="term-input-field" class="cli-input-field" placeholder="type a command (foidfetch, boot, help, rtfm, glory, uname)..." autocomplete="off" spellcheck="false">
+        <span class="cli-dock-hint">Press Enter</span>
+      </div>
+    </div>
+
+    <!-- Omarchy-style Philosophy Narrative Section -->
+    <section id="about">
+      <div class="section-head">
+        <span class="section-badge">Philosophy</span>
+        <h2 class="section-title">Built from scratch.<br>No bloat. No compromise.</h2>
+        <p class="section-desc">
+          Operating systems used to be understandable from top to bottom. Modern Linux distributions became weighed down with bloated init systems, 400MB node_modules, and opaque background daemons. FOID solves this by building everything cleanly from source.
+        </p>
+      </div>
+
+      <div class="grid-cards">
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <span class="feature-num">00</span>
+            <span class="feature-tag">Toolchain</span>
+          </div>
+          <h3>musl-cross-make</h3>
+          <p>
+            Compiled with a dedicated <code>x86_64-linux-musl</code> cross-toolchain. 
+            All binaries are 100% statically linked: zero dynamic linker runtime overhead, zero missing library surprises.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <span class="feature-num">01</span>
+            <span class="feature-tag">Monolithic Kernel</span>
+          </div>
+          <h3>Linux 6.18 LTS</h3>
+          <p>
+            Custom kernel configuration with all storage, filesystem, and networking drivers 
+            compiled straight into <code>vmlinuz</code> (=y). No kernel modules to load or break.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <span class="feature-num">02</span>
+            <span class="feature-tag">Core Userland</span>
+          </div>
+          <h3>Static BusyBox</h3>
+          <p>
+            Provides standard POSIX userland, ash shell, and <code>udhcpc</code> DHCP client 
+            within a single static binary for both the initramfs and the live root.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <span class="feature-num">03</span>
+            <span class="feature-tag">PID 1 Init</span>
+          </div>
+          <h3>runit &amp; foidinit</h3>
+          <p>
+            True UNIX service supervision by Gerrit Pape. Stage banners by foidinit, 
+            instant bootup in under 1 second, and zero systemd complexity.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <span class="feature-num">04</span>
+            <span class="feature-tag">Bootloader</span>
+          </div>
+          <h3>Limine Hybrid Boot</h3>
+          <p>
+            Modern, rock-solid bootloader supporting BIOS and modern 64-bit UEFI hybrid boot 
+            from a single unified ISO image.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <span class="feature-num">05</span>
+            <span class="feature-tag">Live Storage</span>
+          </div>
+          <h3>RAM OverlayFS</h3>
+          <p>
+            The live root filesystem runs from an xz-compressed Squashfs image mounted with a 
+            tmpfs overlay in RAM. Nothing is written to your disks unless you choose to.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Install & Try Section (Styled like Omarchy's Install) -->
+    <section id="install">
+      <div class="section-head">
+        <span class="section-badge">Install &amp; Try</span>
+        <h2 class="section-title">Install FOID Linux<br>(or try it first)</h2>
+        <p class="section-desc">
+          Boot the preview live system inside QEMU, flash it to a bootable USB drive, or build the entire distribution from scratch.
+        </p>
+      </div>
+
+      <div class="install-nav-tabs">
+        <button class="install-tab-btn active" data-install="qemu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          <span>Virtual Machine (QEMU)</span>
+        </button>
+        <button class="install-tab-btn" data-install="usb">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+          <span>Real Hardware (USB)</span>
+        </button>
+        <button class="install-tab-btn" data-install="source">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+          <span>Build from Scratch</span>
+        </button>
+      </div>
+
+      <!-- Panel: QEMU -->
+      <div class="install-panel active" id="install-pane-qemu">
+        <div class="code-snippet-box">
+          <div class="code-snippet-head">
+            <span>Shell &mdash; Boot hybrid ISO in QEMU</span>
+            <button class="copy-snippet-btn" data-copy="qemu-system-x86_64 -m 2G -enable-kvm -cdrom foid-linux.iso">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <pre class="code-snippet-body"><code># Run in QEMU with KVM acceleration:
+qemu-system-x86_64 -m 2G -enable-kvm -cdrom foid-linux.iso
+
+# For UEFI mode testing:
+FOID_UEFI=1 ./test-iso.sh</code></pre>
+        </div>
+        <div class="guidance-box">
+          <strong>Credentials:</strong> Log in as <code>root</code> (no password required). Run <code>foidfetch</code> and <code>help</code>.
+        </div>
+      </div>
+
+      <!-- Panel: USB -->
+      <div class="install-panel" id="install-pane-usb">
+        <div class="code-snippet-box">
+          <div class="code-snippet-head">
+            <span>Shell &mdash; Write directly to flash drive</span>
+            <button class="copy-snippet-btn" data-copy="sudo dd if=foid-linux.iso of=/dev/sdX bs=4M status=progress conv=fsync">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <pre class="code-snippet-body"><code># Verify the block device name with lsblk first:
+lsblk
+
+# Write the hybrid ISO directly to the USB stick (erases the stick):
+sudo dd if=foid-linux.iso of=/dev/sdX bs=4M status=progress conv=fsync</code></pre>
+        </div>
+        <div class="guidance-box">
+          <strong>Note:</strong> Turn <strong>Secure Boot OFF</strong> in your BIOS/UEFI (the Limine bootloader is not Microsoft-signed). Ventoy users: select <em>Normal mode</em>.
+        </div>
+      </div>
+
+      <!-- Panel: Source -->
+      <div class="install-panel" id="install-pane-source">
+        <div class="code-snippet-box">
+          <div class="code-snippet-head">
+            <span>Shell &mdash; End-to-end reproducible build</span>
+            <button class="copy-snippet-btn" data-copy="git clone https://github.com/foidlinux/foidlinux ~/foid && cd ~/foid && ./build-all.sh">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <pre class="code-snippet-body"><code># 1. Clone repository
+git clone https://github.com/foidlinux/foidlinux ~/foid
+cd ~/foid
+
+# 2. Build everything from scratch (toolchain, kernel, busybox, runit, apps, ISO)
+./build-all.sh
+
+# 3. Boot test ISO in QEMU
+./test-iso.sh</code></pre>
+        </div>
+        <div class="guidance-box">
+          <strong>Dependencies:</strong> Linux host with <code>base-devel</code>, <code>curl</code>, <code>xz</code>, <code>bzip2</code>, <code>squashfs-tools</code>, <code>libisoburn</code>, <code>cpio</code>, and <code>limine</code>.
+        </div>
+      </div>
+    </section>
+
+    <!-- Theme Picker Section (Signature Omarchy Feature!) -->
+    <section id="themes">
+      <div class="section-head">
+        <span class="section-badge">Themes</span>
+        <h2 class="section-title">Pick a theme,<br>change everything.</h2>
+        <p class="section-desc">
+          A theme restyles the whole site at once: accents, borders, terminal, and atmosphere. Pick one below, or press <kbd style="background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius: 0;padding:0.1rem 0.4rem;font-family:monospace;">T</kbd> to flip through them.
+        </p>
+      </div>
+
+      <div class="theme-cards-grid">
+        <div class="theme-card-choice active" data-set-theme="noir">
+          <div class="theme-palette-swatch">
+            <span class="swatch-slice" style="background: #08090d;"></span>
+            <span class="swatch-slice" style="background: #00ff41;"></span>
+            <span class="swatch-slice" style="background: #d4a017;"></span>
+            <span class="swatch-slice" style="background: #161b26;"></span>
+          </div>
+          <div class="theme-card-info">
+            <h4>FOID Noir (Default)</h4>
+            <p>Toxic phosphor emerald on carbon black with gold accents.</p>
+          </div>
+        </div>
+
+        <div class="theme-card-choice" data-set-theme="amber">
+          <div class="theme-palette-swatch">
+            <span class="swatch-slice" style="background: #0c0905;"></span>
+            <span class="swatch-slice" style="background: #f59e0b;"></span>
+            <span class="swatch-slice" style="background: #10b981;"></span>
+            <span class="swatch-slice" style="background: #221a0e;"></span>
+          </div>
+          <div class="theme-card-info">
+            <h4>Amber CRT</h4>
+            <p>Warm retro phosphor glow inspired by vintage monochrome terminals.</p>
+          </div>
+        </div>
+
+        <div class="theme-card-choice" data-set-theme="solitude">
+          <div class="theme-palette-swatch">
+            <span class="swatch-slice" style="background: #11141f;"></span>
+            <span class="swatch-slice" style="background: #70a5fd;"></span>
+            <span class="swatch-slice" style="background: #f43f5e;"></span>
+            <span class="swatch-slice" style="background: #22293d;"></span>
+          </div>
+          <div class="theme-card-info">
+            <h4>Solitude Slate</h4>
+            <p>Cool neon blue and crimson highlights on deep night slate.</p>
+          </div>
+        </div>
+
+        <div class="theme-card-choice" data-set-theme="monolith">
+          <div class="theme-palette-swatch">
+            <span class="swatch-slice" style="background: #000000;"></span>
+            <span class="swatch-slice" style="background: #ffffff;"></span>
+            <span class="swatch-slice" style="background: #a1a1aa;"></span>
+            <span class="swatch-slice" style="background: #1a1a1a;"></span>
+          </div>
+          <div class="theme-card-info">
+            <h4>Onyx Monolith</h4>
+            <p>Pure brutalist stark monochrome white and zinc on pitch void.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparison Matrix -->
+    <section id="matrix">
+      <div class="section-head">
+        <span class="section-badge">Comparison</span>
+        <h2 class="section-title">How FOID compares to others</h2>
+        <p class="section-desc">
+          Radically independent, strictly unbloated, and built with deliberate intent.
+        </p>
+      </div>
+
+      <div class="table-container">
+        <table class="foid-matrix">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th class="hero-column">★ FOID Linux</th>
+              <th>Void Linux</th>
+              <th>Alpine Linux</th>
+              <th>Arch Linux</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Foundation</td>
+              <td class="hero-column"><span class="matrix-pill mp-brand">From Scratch</span></td>
+              <td>Independent</td>
+              <td>Independent</td>
+              <td>Independent</td>
+            </tr>
+            <tr>
+              <td>C Library (libc)</td>
+              <td class="hero-column"><span class="matrix-pill mp-brand">musl (pure)</span></td>
+              <td>musl / glibc</td>
+              <td>musl</td>
+              <td><span class="matrix-pill mp-danger">glibc</span></td>
+            </tr>
+            <tr>
+              <td>Init System</td>
+              <td class="hero-column"><span class="matrix-pill mp-brand">runit (PID 1)</span></td>
+              <td>runit</td>
+              <td>OpenRC</td>
+              <td><span class="matrix-pill mp-danger">systemd</span></td>
+            </tr>
+            <tr>
+              <td>Linkage Mode</td>
+              <td class="hero-column"><span class="matrix-pill mp-brand">100% Static</span></td>
+              <td>Dynamic</td>
+              <td>Dynamic</td>
+              <td>Dynamic</td>
+            </tr>
+            <tr>
+              <td>Bootloader</td>
+              <td class="hero-column"><span class="matrix-pill mp-brand">Limine (Hybrid)</span></td>
+              <td>GRUB / EFISTUB</td>
+              <td>syslinux / GRUB</td>
+              <td>systemd-boot / GRUB</td>
+            </tr>
+            <tr>
+              <td>Live Rootfs</td>
+              <td class="hero-column"><span class="matrix-pill mp-brand">RAM Overlay (tmpfs)</span></td>
+              <td>Disk root</td>
+              <td>tmpfs / disk</td>
+              <td>Disk root</td>
+            </tr>
+            <tr>
+              <td>Systemd Allowed</td>
+              <td class="hero-column"><span class="matrix-pill mp-brand">NEVER</span></td>
+              <td>None</td>
+              <td>None</td>
+              <td><span class="matrix-pill mp-danger">Mandatory</span></td>
+            </tr>
+            <tr>
+              <td>Idle Memory (RAM)</td>
+              <td class="hero-column"><span class="matrix-pill mp-brand">&lt; 30 MiB</span></td>
+              <td>~65 MiB</td>
+              <td>~45 MiB</td>
+              <td>~150+ MiB</td>
+            </tr>
+            <tr>
+              <td>Current Release</td>
+              <td class="hero-column"><span class="matrix-pill mp-brand">0.1-preview</span></td>
+              <td>Rolling</td>
+              <td>Release / Edge</td>
+              <td>Rolling</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section id="roadmap">
+      <div class="section-head">
+        <span class="section-badge">Roadmap</span>
+        <h2 class="section-title">Where FOID is heading</h2>
+        <p class="section-desc">
+          Current status is <strong>0.1-preview</strong>: a live text-mode system. Here is what is on the roadmap for upcoming releases.
+        </p>
+      </div>
+
+      <div class="roadmap-grid">
+        <div class="roadmap-block">
+          <div class="roadmap-icon-status">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <div class="roadmap-content">
+            <h4>v0.1-preview (Available)</h4>
+            <p>From-scratch musl toolchain, Linux 6.18 LTS, static BusyBox, runit PID 1, Limine hybrid ISO, DHCP networking, nano, htop, curl, git, dropbear.</p>
+          </div>
+        </div>
+
+        <div class="roadmap-block">
+          <div class="roadmap-icon-status pending">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>
+          </div>
+          <div class="roadmap-content">
+            <h4>foidwm Window Manager</h4>
+            <p>Our own custom Wayland window manager, keyboard-first by design ("the mouse is strictly for web browsers and gaming").</p>
+          </div>
+        </div>
+
+        <div class="roadmap-block">
+          <div class="roadmap-icon-status pending">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>
+          </div>
+          <div class="roadmap-content">
+            <h4>foidinit</h4>
+            <p>A native, ultra-minimal init system tailor-made for FOID Linux to replace upstream runit orchestration stages.</p>
+          </div>
+        </div>
+
+        <div class="roadmap-block">
+          <div class="roadmap-icon-status pending">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>
+          </div>
+          <div class="roadmap-content">
+            <h4>Go Package Manager</h4>
+            <p>A lightning-fast, reproducible package manager written in Go with static binary receipts and zero dynamic library collisions.</p>
+          </div>
+        </div>
+
+        <div class="roadmap-block">
+          <div class="roadmap-icon-status pending">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>
+          </div>
+          <div class="roadmap-content">
+            <h4>Graphical Session</h4>
+            <p>Sway / wlroots Wayland session on static musl as a stable stepping stone toward a full standalone graphical environment.</p>
+          </div>
+        </div>
+
+        <div class="roadmap-block">
+          <div class="roadmap-icon-status pending">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>
+          </div>
+          <div class="roadmap-content">
+            <h4>Bare-Metal Installer</h4>
+            <p>A swift TUI installer allowing users to install FOID Linux permanently to NVMe, SSD, or disk partitions.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Doctrine & FAQ -->
+    <section id="doctrine">
+      <div class="section-head">
+        <span class="section-badge">Doctrine &amp; License</span>
+        <h2 class="section-title">The FOID Principles</h2>
+        <p class="section-desc">
+          Released under the FOID LICENSE v1.0. Keep it minimal. No bloat. No systemd.
+        </p>
+      </div>
+
+      <div class="doctrine-grid">
+        <div class="doctrine-card">
+          <div class="doctrine-clause-title">Is this a meme distribution?</div>
+          <div class="doctrine-clause-body">
+            Yes, completely on purpose. But it actually boots on real hardware and VMs, connects to Ethernet via DHCP, and compiles cleanly from scratch.
+          </div>
+        </div>
+
+        <div class="doctrine-card">
+          <div class="doctrine-clause-title">Why is there no manual?</div>
+          <div class="doctrine-clause-body">
+            RTFM. There is none. You are the manual. (Type <code>help</code> in the console out of mercy.)
+          </div>
+        </div>
+
+        <div class="doctrine-card">
+          <div class="doctrine-clause-title">The FOID Clause (§2)</div>
+          <div class="doctrine-clause-body">
+            If you fork this project, do not call it "FOID" or use the FOID logo/name. Make your own name. Be independent.
+          </div>
+        </div>
+
+        <div class="doctrine-card">
+          <div class="doctrine-clause-title">The No-Bloat Clause (§3)</div>
+          <div class="doctrine-clause-body">
+            The software may not be run on distributions using systemd as PID 1, nor paired with Electron apps that consume 512MB RAM while idle.
+          </div>
+        </div>
+
+        <div class="doctrine-card">
+          <div class="doctrine-clause-title">The Fedora Clause (§4)</div>
+          <div class="doctrine-clause-body">
+            Do not mention "Fedora" in connection with this Software. We do not talk about Fedora. We do not think about Fedora.
+          </div>
+        </div>
+
+        <div class="doctrine-card">
+          <div class="doctrine-clause-title">The RTFM Clause (§99)</div>
+          <div class="doctrine-clause-body">
+            The answer is in the manual. If you refuse to read the manual, your suffering is self-inflicted and no one feels sorry for you.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Omarchy-style Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand-bio">
+          <div class="footer-brand-heading">
+            <span class="brand-logo-badge">F</span>
+            <span>FOID LINUX</span>
+          </div>
+          <p>
+            Freedom · Open · Independent · Distributed. An unapologetically minimal, 
+            source-first Linux distribution built completely from scratch.
+          </p>
+        </div>
+
+        <div class="footer-nav-groups">
+          <div class="footer-nav-col">
+            <h5>Navigation</h5>
+            <ul>
+              <li><a href="#about">About</a></li>
+              <li><a href="#install">Install &amp; Try</a></li>
+              <li><a href="#themes">Themes</a></li>
+              <li><a href="#matrix">Comparison</a></li>
+              <li><a href="#roadmap">Roadmap</a></li>
+            </ul>
+          </div>
+          <div class="footer-nav-col">
+            <h5>Community</h5>
+            <ul>
+              <li><a href="https://github.com/foidlinux/foidlinux" target="_blank" rel="noopener">GitHub</a></li>
+              <li><a href="https://reddit.com/r/foidlinux" target="_blank" rel="noopener">r/foidlinux</a></li>
+              <li><a href="https://github.com/foidlinux/foidlinux/blob/main/LICENSE" target="_blank" rel="noopener">FOID License v1.0</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 FOID Linux Contributors. Glory to FOID.</div>
+        <div>Active Theme: <span id="footer-theme-name" style="color:var(--brand);">FOID Noir</span> &bull; Pure musl &bull; runit PID 1</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts: Theme switcher, tabs, copy, interactive CLI -->
+  <script>
+    // --- Theme Switcher (Omarchy Style) ---
+    const themes = ['noir', 'amber', 'solitude', 'monolith'];
+    const themeNames = {
+      'noir': 'FOID Noir',
+      'amber': 'Amber CRT',
+      'solitude': 'Solitude Slate',
+      'monolith': 'Onyx Monolith'
+    };
+
+    function setTheme(theme) {
+      if (!themes.includes(theme)) theme = 'noir';
+      document.documentElement.setAttribute('data-theme', theme);
+      try {
+        if (typeof localStorage !== 'undefined') localStorage.setItem('foid-theme', theme);
+      } catch (e) {}
+
+      // Update UI elements
+      const themeName = themeNames[theme] || theme;
+      const navLabel = document.getElementById('theme-label-nav');
+      const footerTheme = document.getElementById('footer-theme-name');
+      if (navLabel) navLabel.textContent = themeName.split(' ')[0];
+      if (footerTheme) footerTheme.textContent = themeName;
+
+      // Update active cards
+      document.querySelectorAll('.theme-card-choice').forEach(card => {
+        card.classList.toggle('active', card.dataset.setTheme === theme);
+      });
+    }
+
+    function cycleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'noir';
+      const nextIndex = (themes.indexOf(current) + 1) % themes.length;
+      setTheme(themes[nextIndex]);
+    }
+
+    // Initialize saved theme
+    let savedTheme = 'noir';
+    try {
+      if (typeof localStorage !== 'undefined') savedTheme = localStorage.getItem('foid-theme') || 'noir';
+    } catch (e) {}
+    setTheme(savedTheme);
+
+    // Event listeners for theme picker
+    document.getElementById('theme-toggle-btn')?.addEventListener('click', cycleTheme);
+    document.querySelectorAll('.theme-card-choice').forEach(card => {
+      card.addEventListener('click', () => setTheme(card.dataset.setTheme));
+    });
+
+    // Press 'T' to cycle themes (Omarchy keyboard shortcut)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 't' || e.key === 'T') {
+        // Only if not typing in an input
+        if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+        cycleTheme();
+      }
+    });
+
+    // --- Terminal Tabs ---
+    document.querySelectorAll('.term-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.term-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.term-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const target = document.getElementById('pane-' + btn.dataset.tab);
+        if (target) target.classList.add('active');
+      });
+    });
+
+    // --- Install Tabs ---
+    document.querySelectorAll('.install-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.install-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.install-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const target = document.getElementById('install-pane-' + btn.dataset.install);
+        if (target) target.classList.add('active');
+      });
+    });
+
+    // --- Copy to Clipboard ---
+    function setupCopy(btn, getText) {
+      btn.addEventListener('click', () => {
+        const text = getText();
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(() => {
+          const original = btn.innerHTML;
+          btn.classList.add('copied');
+          btn.innerHTML = `
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Copied!</span>
+          `;
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = original;
+          }, 2000);
+        });
+      });
+    }
+
+    document.querySelectorAll('.copy-snippet-btn').forEach(btn => {
+      setupCopy(btn, () => btn.dataset.copy);
+    });
+
+    const heroQuickCopy = document.getElementById('hero-quick-copy');
+    if (heroQuickCopy) {
+      setupCopy(heroQuickCopy, () => heroQuickCopy.dataset.copy);
+    }
+
+    // --- Interactive Terminal CLI ---
+    const termInput = document.getElementById('term-input-field');
+    const termViewport = document.getElementById('term-viewport');
+    const cliOutputLog = document.getElementById('cli-output-log');
+
+    function appendTerminalLog(cmd, resHtml) {
+      if (!cliOutputLog) return;
+      cliOutputLog.style.display = 'flex';
+      const line = document.createElement('div');
+      line.style.animation = 'fadeIn 0.15s ease';
+      line.innerHTML = `
+        <div style="color:var(--brand); font-weight:600;">root@foid:~# ${escapeXml(cmd)}</div>
+        <div style="color:var(--text); margin-top:2px; white-space:pre-wrap;">${resHtml}</div>
+      `;
+      cliOutputLog.appendChild(line);
+      termViewport.scrollTop = termViewport.scrollHeight;
+    }
+
+    function escapeXml(str) {
+      const map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
+      return str.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    if (termInput) {
+      termInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const raw = termInput.value.trim();
+          const cmd = raw.toLowerCase();
+          termInput.value = '';
+          if (!cmd) return;
+
+          if (cmd === 'clear') {
+            if (cliOutputLog) {
+              cliOutputLog.innerHTML = '';
+              cliOutputLog.style.display = 'none';
+            }
+            document.querySelector('.term-tab-btn[data-tab="foidfetch"]')?.click();
+            return;
+          }
+
+          if (cmd === 'foidfetch' || cmd === 'fetch') {
+            document.querySelector('.term-tab-btn[data-tab="foidfetch"]')?.click();
+            appendTerminalLog(raw, `<span class="color-brand">Showing foidfetch output above.</span>`);
+          } else if (cmd === 'boot' || cmd === 'dmesg' || cmd === 'bootlog') {
+            document.querySelector('.term-tab-btn[data-tab="bootlog"]')?.click();
+            appendTerminalLog(raw, `<span class="color-accent">Switched to foidinit boot log.</span>`);
+          } else if (cmd === 'help' || cmd === 'foid-help') {
+            document.querySelector('.term-tab-btn[data-tab="help"]')?.click();
+            appendTerminalLog(raw, `<span class="color-accent">Switched to help tab.</span>`);
+          } else if (cmd === 'doctrine' || cmd === 'license') {
+            document.querySelector('.term-tab-btn[data-tab="doctrine"]')?.click();
+            appendTerminalLog(raw, `<span class="color-brand">FOID License v1.0 shown.</span>`);
+          } else if (cmd === 'rtfm') {
+            appendTerminalLog(raw, `<span class="color-brand">RTFM: there is no manual. You ARE the manual.</span>`);
+          } else if (cmd === 'glory') {
+            appendTerminalLog(raw, `<span class="color-brand">[ GLORY ]</span> <span class="color-accent">services march under the banner of FOID Linux!</span>`);
+          } else if (cmd.includes('systemctl') || cmd.includes('systemd') || cmd.includes('journalctl')) {
+            appendTerminalLog(raw, `<span class="color-danger">sh: ${escapeXml(raw)}: command not found\nCRITICAL VIOLATION: Clause 3 (The No-Bloat Clause) invoked. Systemd is strictly forbidden.</span>`);
+          } else if (cmd === 'uname' || cmd === 'uname -a') {
+            appendTerminalLog(raw, `Linux foid 6.18-foid #1 SMP PREEMPT x86_64-linux-musl Linux`);
+          } else if (cmd === 'whoami' || cmd === 'id') {
+            appendTerminalLog(raw, `uid=0(root) gid=0(root) groups=0(root)`);
+          } else {
+            appendTerminalLog(raw, `sh: ${escapeXml(raw)}: command not found. Try: <span class="color-accent">foidfetch</span>, <span class="color-accent">boot</span>, <span class="color-accent">help</span>, <span class="color-accent">rtfm</span>, <span class="color-accent">glory</span>, <span class="color-accent">uname</span>, <span class="color-accent">clear</span>`);
+          }
+        }
+      });
+    }
+  </script>
 </body>
 </html>
